@@ -4,7 +4,7 @@ from numpy.typing import NDArray
 class SimpleLinearRegression:
     """Simple linear regression model with one input and one output.
     """
-    def _nit__(self, input_train_data: NDArray[np.float64], output_train_data: NDArray[np.float64]) -> None: 
+    def __init__(self, input_train_data: NDArray[np.float64], output_train_data: NDArray[np.float64]) -> None: 
         self.input_train_data: NDArray[np.float64] = input_train_data
         self.output_train_data: NDArray[np.float64] = output_train_data
         self.n: int = len(input_train_data)
