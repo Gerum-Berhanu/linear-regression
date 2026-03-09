@@ -20,18 +20,30 @@ Divided by sections, most code cells in the jupyter notebook have markdowns that
 
 ## Conclusion
 
+### About the model
+
 The model decided the best parameters to be:
-- $\beta_0=115385.937$
-- $\beta_1=42366.231$
+- $\beta_0=57,507.76$
+- $\beta_1=7,133.48$
 
 meaning the best fit line is:
-$$Y=115385.937 + 42366.231x$$
+$$Y=57,507.76 + 7,133.48x$$
 
-The Mean Absolute Error is 24458.960 meaning that the overall prediction was off to the real-data by, on average, $24K. Even though this might be the best we can do with simple linear regression, when interpreted in real-life, this offset is a big issue/concern for someone who may be using this model to have some insight about, for example, the job market.
+Key insights we get from this formula is:
+- If one has zero years of experience (x=0), then their expected salary is $58K.
+- A 1 year of experience increase is expected to have a $7K salary gain.
 
-## Notes
+The Mean Absolute Error is *25,390.97* meaning that the overall prediction was off to the real-data by, on average, *$25K*. Even though this might be the best we can do with simple linear regression, when interpreted in real-life, this offset is a big issue/concern for someone who may be using this model to have some insight about, for example, the job market.
 
-- When scaling both *y_train* and *y_test*, the MAE got some small changes to be 24299.501. I thought scaling wouldn't have any effect. Imma find out the reason. My guess is that it has something to do with precision problem of floats.
+### Why is standardization not necessary?
+
+A **closed-form solution** means the parameters for a model can be directly computed using prepared formulas. Linear Regression (simple or multi) has a closed-form solution $\theta=(X^TX)^{-1}X^Ty$ which works regardless of feature scales. So standardization is not required for Linear Regression.
+
+However, much more complex models like Logistic Regression and Neural Networks have no closed-form solutions (parameters can't be isolated using basic algebra). Their parameters are solved by a method we call **iterative optimization** (basically by many trial and error steps). One optimization algorithm is the Gradient Descent.
+
+**Gradient Descent** can converge slowly or inefficiently when features have very different scales. This is where standardization steps up; it fixes the extreme scale problem by bringing all features to roughly the same scale.
+
+Though, it is important to remember that Linear Regression is often solved using Gradient Descent too. In practice, the Normal Equation becomes computationally expensive because inverting a massive matrix takes a lot of processing power. In those cases, we switch to Gradient Descent even for Linear Regression; and at that point, standardization becomes mandatory again.
 
 ## Next Steps
 
@@ -41,4 +53,4 @@ The Mean Absolute Error is 24458.960 meaning that the overall prediction was off
 ## Quick Proof
 A quick proof of mine for how, fundamentally and mathematically, a simple linear regression works (how the parameters are calculated):
 
-![Simple linear regression proof image](./linear_regression_proof.png)
+<img src="./linear_regression_proof.png" width="70%" style="display: block; margin: 0 auto;" alt="Simple linear regression proof">
