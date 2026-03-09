@@ -1,75 +1,77 @@
 import numpy as np
 
-class SLR:
+class SimpleLinearRegression:
     """
     - simple linear regression
     - accepts the training dataset
     - do the calculations Ex, Ey, Exy, Ex^2
     - solve for the parameters
     """
-    def __init__(self, data_list): 
+    def __init__(self, input_train_data, output_train_data): 
         """
         Input Type (of np.array): [[x1,x2,...,xn], [y1,y2,...,yn]]
         """
-        self.dl = data_list
-        self.n = len(data_list[0])
+        self.input_train_data = input_train_data
+        self.output_train_data = output_train_data
+        self.n = len(input_train_data)
         self._calc_()
         self._solve_()
     
     def _calc_(self):
-        self.s_x = np.sum(self.dl[0])
-        self.s_y = np.sum(self.dl[1])
-        self.s_xy = np.sum(self.dl[0] * self.dl[1])
-        self.s_x_sqr = np.sum(self.dl[0] * self.dl[0])
+        self.Ex = np.sum(self.input_train_data)
+        self.Ey = np.sum(self.output_train_data)
+        self.Exy = np.sum(self.input_train_data * self.output_train_data)
+        self.Ex_sqr = np.sum(pow(self.input_train_data, 2))
     
     def _solve_(self):
-        common_denominator = (self.n * self.s_x_sqr) - (self.s_x * self.s_x)
-        self.m = ( (self.n * self.s_xy) - (self.s_x * self.s_y) ) / common_denominator
-        self.b = ( (self.s_y * self.s_x_sqr) - (self.s_x * self.s_xy) ) / common_denominator
+        common_denominator = (self.n * self.Ex_sqr) - (self.Ex * self.Ex)
+        self.b0 = ( (self.Ey * self.Ex_sqr) - (self.Ex * self.Exy) ) / common_denominator
+        self.b1 = ( (self.n * self.Exy) - (self.Ex * self.Ey) ) / common_denominator
 
     def get_params(self):
-        return self.m, self.b
+        return self.b0, self.b1
 
-    def predict(self, test_data):
+    def predict(self, input_test_data):
         """
         Input Type (of np.array): [x1,x2,...,xn]
         Output Type (of np.array): [y1,y2,...,yn]
         """
-        return self.m * test_data + self.b
+        return self.b1 * input_test_data + self.b0
     
 class ModelKit:
-    def MAE(self, target, base):
+    def MAE(self, dataset_1, dataset_2):
         """
         Returns the mean absolute error between the two given datasets.
         """
-        return np.sum(abs(target - base)) / len(base)
+        return np.sum(abs(dataset_1 - dataset_2)) / len(dataset_2)
     
-    def split_data(self, data_list, train_percentage):
+    def split_data(self, dataset, train_percentage):
         """
-        Returns (train_data, test_data)"""
-        split_size = int(len(data_list) * train_percentage)
-        train_data = data_list[:split_size]
-        test_data = data_list[split_size:]
+        Returns (train_data, test_data)
+        """
+        split_size = int(len(dataset) * train_percentage)
+        train_data = dataset[:split_size]
+        test_data = dataset[split_size:]
         return train_data, test_data
 
 class StatKit:
-    def get_mean(self, data_list):
-        return np.sum(data_list) / len(data_list)
+    def get_mean(self, dataset):
+        return np.sum(dataset) / len(dataset)
     
-    def get_var_std(self, data_list):
+    def get_var_std(self, dataset):
         """
         Returns (variance, standard deviation)
         """
-        n = len(data_list)
-        mean = self.get_mean(data_list)
-        sqr_sum = np.sum(pow(data_list, 2))
+        n = len(dataset)
+        mean = self.get_mean(dataset)
+        sqr_sum = np.sum(pow(dataset, 2))
         variance = (sqr_sum / n) - pow(mean, 2)
         return (variance, pow(variance, 0.5))
     
-    def standardize(self, data_list):
+    def standardize(self, dataset):
         """
         Returns (standardized data, mean, standard deviation)
         """
-        mean = self.get_mean(data_list)
-        std_dev = self.get_var_std(data_list)[1]
-        return (data_list - mean) / std_dev, mean, std_dev
+        mean = self.get_mean(dataset)
+        std_dev = self.get_var_std(dataset)[1]
+        return (dataset - mean) / std_dev, mean, std_dev
