@@ -14,6 +14,11 @@ class ModelKit:
         """Return the root mean squared error between two datasets."""
         return pow(np.mean(pow((target_dataset - base_dataset), 2)), 0.5).astype(np.float64)
     
+    def r_squared(self, target_dataset: npt.NDArray[np.float64], base_dataset: npt.NDArray[np.float64]) -> np.float64:
+        """Return the R-squared value of a target dataset relative to a base dataset."""
+        ss_res = np.sum(pow((target_dataset - base_dataset), 2)) # variance from the line
+        ss_tot = np.sum(pow((target_dataset - np.mean(target_dataset)), 2)) # variance from the mean
+        return (1 - (ss_res / ss_tot)).astype(np.float64)
     
     def split_data(self, dataset: npt.NDArray[np.float64], train_percentage: float) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
         """Split a dataset into train and test slices without shuffling."""
