@@ -37,6 +37,7 @@ Why this step matters:
 The main analysis is in [salary.ipynb](salary.ipynb), which includes:
 - Data loading, cleaning, and splitting
 - Model training using years of experience to predict salary
+- K-fold cross validation
 - Performance evaluation (MAE, MAPE, RMSE, R²)
 - Visualizations and interpretations
 
@@ -62,9 +63,8 @@ The `ModelKit` class provides:
 
 A quick proof of mine for how, fundamentally and mathematically, a simple linear regression works (how the parameters are calculated):
 
-<img src="./linear_regression_proof.png" width="70%" style="display: block; margin: 0 auto;" alt="Simple linear regression proof">
+<img src="./linear_regression_proof.png" width="50%" style="display: block; margin: 0 auto;" alt="Simple linear regression proof">
 
-## Next Steps
+## What's next?
 
-1. Add k-fold cross-validation
-2. Extend to multiple linear regression
+1. Extend to multiple linear regression
