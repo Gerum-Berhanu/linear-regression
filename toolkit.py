@@ -22,8 +22,14 @@ class ModelKit:
         return np.mean(abs(dataset_1 - dataset_2)).astype(np.float64)
     
     def mean_absolute_percentage_error(self, predicted_dataset: npt.NDArray[np.float64], actual_dataset: npt.NDArray[np.float64]) -> np.float64:
-        """Return the mean absolute percentage error relative to the base dataset."""
-        return np.mean(abs(predicted_dataset - actual_dataset) / actual_dataset).astype(np.float64)
+        """Return the mean absolute percentage error excluding zero-valued targets."""
+        non_zero_mask = actual_dataset != 0 # creates an array of True and False values with the same shape
+        if not np.any(non_zero_mask):
+            raise ValueError("MAPE is undefined when all actual values are zero.")
+        
+        filtered_predicted = predicted_dataset[non_zero_mask] # keep (drop) positions where the mask it True (False)
+        filtered_actual = actual_dataset[non_zero_mask]
+        return np.mean(abs(filtered_predicted - filtered_actual) / filtered_actual).astype(np.float64)
 
     def root_mean_squared_error(self, predicted_dataset: npt.NDArray[np.float64], actual_dataset: npt.NDArray[np.float64]) -> np.float64:
         """Return the root mean squared error between two datasets."""
