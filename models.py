@@ -4,7 +4,7 @@ import numpy.typing as npt
 class SimpleLinearRegression:
     """Simple linear regression model with one input and one output.
     """
-    def __init__(self, input_train_data: npt.NDArray[np.float64], output_train_data: npt.NDArray[np.float64]) -> None: 
+    def train(self, input_train_data: npt.NDArray[np.float64], output_train_data: npt.NDArray[np.float64]) -> None: 
         self.input_train_data: npt.NDArray[np.float64] = input_train_data
         self.output_train_data: npt.NDArray[np.float64] = output_train_data
         self.n: int = len(input_train_data)
