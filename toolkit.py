@@ -53,20 +53,24 @@ class ModelKit:
         return X_train, X_test, y_train, y_test
 
 class StatKit:
-    def get_mean(self, dataset: npt.NDArray[np.float64]) -> np.float64:
+    def mean(self, dataset: npt.NDArray[np.float64]) -> np.float64:
         """Return the arithmetic mean of a dataset."""
         return np.mean(dataset).astype(np.float64)
     
-    def get_var_std(self, dataset: npt.NDArray[np.float64]) -> tuple[np.float64, np.float64]:
-        """Return the population variance and standard deviation of a dataset."""
+    def std(self, dataset: npt.NDArray[np.float64]) -> np.float64:
+        """Return the standard deviation of a dataset."""
+        return pow(self.var(dataset), 0.5)
+
+    def var(self, dataset: npt.NDArray[np.float64]) -> np.float64:
+        """Return the population variance of a dataset."""
         n = len(dataset)
-        mean = self.get_mean(dataset)
+        mean_val = self.mean(dataset)
         sqr_sum = np.sum(pow(dataset, 2))
-        variance = (sqr_sum / n) - pow(mean, 2)
-        return (variance, pow(variance, 0.5))
+        variance = (sqr_sum / n) - pow(mean_val, 2)
+        return variance
     
     def standardize(self, dataset: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         """Return the z-score standardized form of a dataset."""
-        mean = self.get_mean(dataset)
-        std_dev = self.get_var_std(dataset)[1]
-        return (dataset - mean) / std_dev
+        mean_val = self.mean(dataset)
+        std_dev = self.std(dataset)
+        return (dataset - mean_val) / std_dev
