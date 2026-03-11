@@ -5,6 +5,11 @@ class SimpleLinearRegression:
     """Simple linear regression model with one input and one output.
     """
     def train(self, input_train_data: npt.NDArray[np.float64], output_train_data: npt.NDArray[np.float64]) -> None: 
+        if input_train_data.ndim != 1:
+            raise ValueError("Input training data must be one-dimensional for SimpleLinearRegression.")
+        if output_train_data.ndim != 1:
+            raise ValueError("Output training data must be one-dimensional for SimpleLinearRegression.")
+
         if len(input_train_data) != len(output_train_data):
             raise ValueError("Input and output train data don't have the same length.")
         if len(input_train_data) == 0 or len(output_train_data) == 0:
@@ -14,14 +19,14 @@ class SimpleLinearRegression:
         self.output_train_data: npt.NDArray[np.float64] = output_train_data
         self.n: int = len(input_train_data)
 
-        self._calc_()
-        self._fit_()
+        self._calc()
+        self._fit()
 
     def _ensure_fitted(self) -> None:
         if not hasattr(self, "b0") or not hasattr(self, "b1"):
             raise ValueError("Model must be trained before requesting parameters or predictions.")
     
-    def _calc_(self) -> None:
+    def _calc(self) -> None:
         """Calculates key terms later used in the calculations of finding the parameters.
         """
         self.Ex = np.sum(self.input_train_data)
@@ -29,7 +34,7 @@ class SimpleLinearRegression:
         self.Exy = np.sum(self.input_train_data * self.output_train_data)
         self.Ex_sqr = np.sum(pow(self.input_train_data, 2))
     
-    def _fit_(self) -> None:
+    def _fit(self) -> None:
         r"""Solves for the best fit parameters b0 and b1. 
         
         Below are the two formulas (in LaTeX) used to solve for the parameters:
@@ -52,6 +57,8 @@ class SimpleLinearRegression:
         return self.b0, self.b1
 
     def predict(self, input_test_data: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+        if input_test_data.ndim != 1:
+            raise ValueError("Prediction input data must be one-dimensional for SimpleLinearRegression.")
         self._ensure_fitted()
         return self.b0 + self.b1 * input_test_data
     
