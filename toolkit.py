@@ -6,20 +6,16 @@ class ModelKit:
         """
         Divide dataset into shuffled k-fold buckets for cross-validation.
         
-        Returns list of (X, y) tuples, each containing fold buckets of equal size
+        Returns list of (X, y) tuples with nearly equal bucket sizes.
         """
         perm = np.random.permutation(len(X))
         X_shuffled = X[perm]
         y_shuffled = y[perm]
 
-        size = len(X) // fold
-        bucket_list = []
-        for n in range(fold):
-            start = size * n
-            end = size * (n + 1)
-            bucket_set = (X_shuffled[start:end], y_shuffled[start:end])
-            bucket_list.append(bucket_set)
-        return bucket_list
+        X_buckets = np.array_split(X_shuffled, fold)
+        y_buckets = np.array_split(y_shuffled, fold)
+
+        return list(zip(X_buckets, y_buckets))
 
     def mean_absolute_error(self, dataset_1: npt.NDArray[np.float64], dataset_2: npt.NDArray[np.float64]) -> np.float64:
         """Return the mean absolute error between two datasets."""
