@@ -35,7 +35,7 @@ class SimpleLinearRegression:
         self.b0 = ( (self.Ey * self.Ex_sqr) - (self.Ex * self.Exy) ) / common_denominator
         self.b1 = ( (self.n * self.Exy) - (self.Ex * self.Ey) ) / common_denominator
 
-    def get_params(self) -> tuple[np.float64, np.float64]:
+    def params(self) -> tuple[np.float64, np.float64]:
         return self.b0, self.b1
 
     def predict(self, input_test_data: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
