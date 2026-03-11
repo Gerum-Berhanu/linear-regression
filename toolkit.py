@@ -2,13 +2,26 @@ import numpy as np
 import numpy.typing as npt
 
 class ModelKit:
-    def bucket_dataset(self, X: npt.NDArray[np.float64], y: npt.NDArray[np.float64], fold: int) -> list[tuple[npt.NDArray, npt.NDArray]]:
+    def _validate_paired_datasets(self, dataset_1: npt.NDArray[np.float64], dataset_2: npt.NDArray[np.float64]) -> None:
+        if len(dataset_1) != len(dataset_2):
+            raise ValueError("Paired datasets must have the same length.")
+        if len(dataset_1) == 0:
+            raise ValueError("Paired datasets cannot be empty.")
+
+    def bucket_dataset(self, X: npt.NDArray[np.float64], y: npt.NDArray[np.float64], fold: int, random_state: int | None = None) -> list[tuple[npt.NDArray, npt.NDArray]]:
         """
         Divide dataset into shuffled k-fold buckets for cross-validation.
         
         Returns list of (X, y) tuples with nearly equal bucket sizes.
         """
-        perm = np.random.permutation(len(X))
+        self._validate_paired_datasets(X, y)
+        if fold <= 1:
+            raise ValueError("Fold count must be greater than 1.")
+        if fold > len(X):
+            raise ValueError("Fold count cannot be greater than dataset length.")
+
+        rng = np.random.default_rng(random_state)
+        perm = rng.permutation(len(X))
         X_shuffled = X[perm]
         y_shuffled = y[perm]
 
@@ -19,10 +32,12 @@ class ModelKit:
 
     def mean_absolute_error(self, dataset_1: npt.NDArray[np.float64], dataset_2: npt.NDArray[np.float64]) -> np.float64:
         """Return the mean absolute error between two datasets."""
+        self._validate_paired_datasets(dataset_1, dataset_2)
         return np.mean(abs(dataset_1 - dataset_2)).astype(np.float64)
     
     def mean_absolute_percentage_error(self, predicted_dataset: npt.NDArray[np.float64], actual_dataset: npt.NDArray[np.float64]) -> np.float64:
         """Return the mean absolute percentage error excluding zero-valued targets."""
+        self._validate_paired_datasets(predicted_dataset, actual_dataset)
         non_zero_mask = actual_dataset != 0 # creates an array of True and False values with the same shape
         if not np.any(non_zero_mask):
             raise ValueError("MAPE is undefined when all actual values are zero.")
@@ -33,17 +48,26 @@ class ModelKit:
 
     def root_mean_squared_error(self, predicted_dataset: npt.NDArray[np.float64], actual_dataset: npt.NDArray[np.float64]) -> np.float64:
         """Return the root mean squared error between two datasets."""
+        self._validate_paired_datasets(predicted_dataset, actual_dataset)
         return pow(np.mean(pow((predicted_dataset - actual_dataset), 2)), 0.5).astype(np.float64)
     
     def r_squared(self, predicted_dataset: npt.NDArray[np.float64], actual_dataset: npt.NDArray[np.float64]) -> np.float64:
         """Return the R-squared value of a target dataset relative to a base dataset."""
+        self._validate_paired_datasets(predicted_dataset, actual_dataset)
         ss_res = np.sum(pow((actual_dataset - predicted_dataset), 2)) # variance from the line
         ss_tot = np.sum(pow((actual_dataset - np.mean(actual_dataset)), 2)) # variance from the mean
+        if np.isclose(ss_tot, 0):
+            raise ValueError("R-squared is undefined when all actual values are the same.")
         return (1 - (ss_res / ss_tot)).astype(np.float64)
     
-    def split_dataset(self, X: npt.NDArray[np.float64], y: npt.NDArray[np.float64], train_percentage: float) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+    def split_dataset(self, X: npt.NDArray[np.float64], y: npt.NDArray[np.float64], train_percentage: float, random_state: int | None = None) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64]]:
         """Return X_train, X_test, y_train, y_test after shuffling."""
-        perm = np.random.permutation(len(X))
+        self._validate_paired_datasets(X, y)
+        if train_percentage <= 0 or train_percentage >= 1:
+            raise ValueError("Train percentage must be between 0 and 1, exclusive.")
+
+        rng = np.random.default_rng(random_state)
+        perm = rng.permutation(len(X))
         X_shuffled = X[perm]
         y_shuffled = y[perm]
 
