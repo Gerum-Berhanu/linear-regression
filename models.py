@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.typing as npt
+from toolkit import StatKit
 
 class SimpleLinearRegression:
     """Simple linear regression model with one input and one output.
@@ -62,3 +63,64 @@ class SimpleLinearRegression:
         self._ensure_fitted()
         return self.b0 + self.b1 * input_test_data
     
+class MultiLinearRegression():
+    # train
+    # _fit
+    # params
+    # predict
+
+    def train(self, features: list[npt.NDArray[np.float64]], label: npt.NDArray[np.float64]):
+        if label.ndim != 1:
+            raise ValueError("Label data must be one-dimensional.")
+
+        if len(features) == 0:
+            raise ValueError("At least one feature dataset is required.")
+
+        self.X = self._features_matrix(features)
+        if len(label) != self.X.shape[0]:
+            raise ValueError("Feature and label must have the same length.")
+
+        self.y = label
+        self._fit()
+
+    def _features_matrix(self, features: list[npt.NDArray[np.float64]]) -> npt.NDArray[np.float64]:
+        if len(features) == 0:
+            raise ValueError("At least one feature dataset is required.")
+
+        n_samples = len(features[0])
+        if n_samples == 0:
+            raise ValueError("Feature datasets cannot be empty.")
+
+        for idx, feature in enumerate(features):
+            if feature.ndim != 1:
+                raise ValueError(f"Feature datasets must be one-dimensional. features[{idx}] is not 1D.")
+            if len(feature) != n_samples:
+                raise ValueError(
+                    f"All feature datasets must have the same length. "
+                    f"features[0] has length {n_samples}, features[{idx}] has length {len(feature)}."
+                )
+
+        # Stack features column-wise so shape becomes (n_samples, n_features).
+        return np.column_stack(features).astype(np.float64)
+
+    def _fit(self):
+        # \theta = (X^TX)^{-1}X^Ty
+        X = self.X
+        y = self.y
+        T = X.T
+        XT = T @ X
+
+        det = np.linalg.det(XT)
+        if np.isclose(det, 0):
+            raise ValueError("Matrix is singular.")
+        
+        inv = np.linalg.inv(XT)
+
+        self.theta = inv @ (T @ y)
+
+    def predict(self, new_dataset: list[npt.NDArray[np.float64]]) -> npt.NDArray[np.float64]:
+        if not hasattr(self, "theta"):
+            raise ValueError("Model must be trained before prediction.")
+
+        X_new = self._features_matrix(new_dataset)
+        return X_new @ self.theta
