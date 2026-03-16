@@ -94,7 +94,7 @@ class StatKit:
             raise ValueError("Correlation is undefined when either dataset has zero variance.")
 
         return cov / (std_1 * std_2)
-        
+    
     def cov(self, dataset_1: npt.NDArray[np.float64], dataset_2: npt.NDArray[np.float64]) -> np.float64:
         self._validate_paired_datasets(dataset_1, dataset_2)
 
@@ -107,6 +107,33 @@ class StatKit:
         prod = diff_1 * diff_2
 
         return self.mean(prod)
+
+    def corr_matrix(self, datasets: list[npt.NDArray[np.float64]]) -> npt.NDArray[np.float64]:
+        """Return an NxN correlation matrix following the input list order."""
+        if len(datasets) == 0:
+            raise ValueError("At least one dataset is required.")
+    
+        expected_len = len(datasets[0])
+        if expected_len == 0:
+            raise ValueError("Datasets cannot be empty.")
+    
+        for idx, ds in enumerate(datasets):
+            if len(ds) != expected_len:
+                raise ValueError(
+                    f"All datasets must have the same length. "
+                    f"datasets[0] has length {expected_len}, datasets[{idx}] has length {len(ds)}."
+                )
+    
+        n = len(datasets)
+        matrix = np.empty((n, n), dtype=np.float64)
+    
+        for i in range(n):
+            for j in range(i, n):
+                score = self.corr(datasets[i], datasets[j])
+                matrix[i, j] = score
+                matrix[j, i] = score
+    
+        return matrix
 
     def mean(self, dataset: npt.NDArray[np.float64]) -> np.float64:
         """Return the arithmetic mean of a dataset."""
