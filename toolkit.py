@@ -60,9 +60,21 @@ class ModelKit:
             raise ValueError("R-squared is undefined when all actual values are the same.")
         return (1 - (ss_res / ss_tot)).astype(np.float64)
     
-    def split_dataset(self, X: npt.NDArray[np.float64], y: npt.NDArray[np.float64], train_percentage: float, random_state: int | None = None) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64]]:
-        """Return X_train, X_test, y_train, y_test after shuffling."""
-        self._validate_paired_datasets(X, y)
+    def split_dataset(self, X: npt.NDArray[np.float64] | list[npt.NDArray[np.float64]], y: npt.NDArray[np.float64], train_percentage: float, random_state: int | None = None) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+        """Return X_train, X_test, y_train, y_test after shuffling.
+
+        X may be 1-D (single feature) or 2-D with shape (n_samples, n_features).
+        """
+        if isinstance(X, list):
+            if len(X) == 0:
+                raise ValueError("X must contain at least one feature array.")
+            X = np.column_stack(X).astype(np.float64)
+        if X.ndim not in (1, 2):
+            raise ValueError("X must be 1-D (single feature) or 2-D (multiple features).")
+        if len(X) != len(y):
+            raise ValueError("Paired datasets must have the same length.")
+        if len(y) == 0:
+            raise ValueError("Paired datasets cannot be empty.")
         if train_percentage <= 0 or train_percentage >= 1:
             raise ValueError("Train percentage must be between 0 and 1, exclusive.")
 
