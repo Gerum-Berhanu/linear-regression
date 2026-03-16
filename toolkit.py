@@ -79,6 +79,35 @@ class ModelKit:
         return X_train, X_test, y_train, y_test
 
 class StatKit:
+    def _validate_paired_datasets(self, dataset_1: npt.NDArray[np.float64], dataset_2: npt.NDArray[np.float64]) -> None:
+        if len(dataset_1) != len(dataset_2):
+            raise ValueError("Paired datasets must have the same length.")
+        if len(dataset_1) == 0:
+            raise ValueError("Paired datasets cannot be empty.")
+        
+    def corr(self, dataset_1: npt.NDArray[np.float64], dataset_2: npt.NDArray[np.float64]) -> np.float64:
+        cov = self.cov(dataset_1, dataset_2)
+        std_1 = self.std(dataset_1)
+        std_2 = self.std(dataset_2)
+
+        if np.isclose(std_1, 0) or np.isclose(std_2, 0):
+            raise ValueError("Correlation is undefined when either dataset has zero variance.")
+
+        return cov / (std_1 * std_2)
+        
+    def cov(self, dataset_1: npt.NDArray[np.float64], dataset_2: npt.NDArray[np.float64]) -> np.float64:
+        self._validate_paired_datasets(dataset_1, dataset_2)
+
+        mean_1 = np.mean(dataset_1)
+        mean_2 = np.mean(dataset_2)
+
+        diff_1 = dataset_1 - mean_1
+        diff_2 = dataset_2 - mean_2
+
+        prod = diff_1 * diff_2
+
+        return self.mean(prod)
+
     def mean(self, dataset: npt.NDArray[np.float64]) -> np.float64:
         """Return the arithmetic mean of a dataset."""
         return np.mean(dataset).astype(np.float64)
