@@ -12,6 +12,12 @@ A from-scratch implementation of simple linear regression using NumPy, Pandas, a
 
 ## Setup
 
+Create and activate a virtual environment:
+
+| Windows | Linux/macOS |
+|---|---|
+| `python -m venv .venv`<br>`.venv\Scripts\activate` | `python3 -m venv .venv`<br>`source .venv/bin/activate` |
+
 Install dependencies:
 ```bash
 pip install -r requirements.txt
