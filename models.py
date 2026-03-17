@@ -63,12 +63,7 @@ class SimpleLinearRegression:
         self._ensure_fitted()
         return self.b0 + self.b1 * input_test_data
     
-class MultiLinearRegression():
-    # train
-    # _fit
-    # params
-    # predict
-
+class MultiLinearRegression:
     def train(self, features: list[npt.NDArray[np.float64]], label: npt.NDArray[np.float64]):
         if label.ndim != 1:
             raise ValueError("Label data must be one-dimensional.")
@@ -100,8 +95,10 @@ class MultiLinearRegression():
                     f"features[0] has length {n_samples}, features[{idx}] has length {len(feature)}."
                 )
 
-        # Stack features column-wise so shape becomes (n_samples, n_features).
-        return np.column_stack(features).astype(np.float64)
+        # Stack features then prepend a bias column so the model learns an intercept.
+        X = np.column_stack(features).astype(np.float64)
+        ones = np.ones((n_samples, 1), dtype=np.float64)
+        return np.hstack((ones, X))
 
     def _fit(self):
         # \theta = (X^TX)^{-1}X^Ty
