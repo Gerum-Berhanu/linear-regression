@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.typing as npt
+import matplotlib.pyplot as plt
 
 class ModelKit:
     def _validate_paired_datasets(self, dataset_1: npt.NDArray[np.float64], dataset_2: npt.NDArray[np.float64]) -> None:
@@ -146,6 +147,25 @@ class StatKit:
                 matrix[j, i] = score
     
         return matrix
+
+    def plot_corr_matrix_heatmap(self, datasets: list[npt.NDArray[np.float64]], labels: list[str]) -> None:
+        """Plot a heatmap of the correlation matrix for the given datasets."""
+        corr = self.corr_matrix(datasets)
+
+        plt.figure(figsize=(7, 6))
+        im = plt.imshow(corr, cmap="coolwarm", vmin=-1, vmax=1)
+        plt.colorbar(im, label="Correlation")
+
+        plt.xticks(range(len(labels)), labels, rotation=45, ha="right")
+        plt.yticks(range(len(labels)), labels)
+
+        for i in range(corr.shape[0]):
+            for j in range(corr.shape[1]):
+                plt.text(j, i, f"{corr[i, j]:.2f}", ha="center", va="center", color="black")
+
+        plt.title("Correlation Matrix Heatmap")
+        plt.tight_layout()
+        plt.show()
 
     def mean(self, dataset: npt.NDArray[np.float64]) -> np.float64:
         """Return the arithmetic mean of a dataset."""
