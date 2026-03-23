@@ -1,6 +1,7 @@
 import numpy as np
 import numpy.typing as npt
 import matplotlib.pyplot as plt
+import pandas as pd
 
 class ModelKit:
     def _validate_paired_datasets(self, dataset_1: npt.NDArray[np.float64], dataset_2: npt.NDArray[np.float64]) -> None:
@@ -147,6 +148,26 @@ class StatKit:
                 matrix[j, i] = score
     
         return matrix
+
+    def one_hot_encode(self, df: pd.DataFrame, columns: list[str] | str, drop_first: bool = False) -> pd.DataFrame:
+        """
+        One-hot encode specified categorical columns in a DataFrame.
+        
+        Args:
+            df: The pandas DataFrame containing the data.
+            columns: A single column name or a list of column names to encode.
+            drop_first: Whether to get k-1 dummies out of k categorical levels by removing the first level.
+                        (True is recommended for linear regression to avoid perfect multicollinearity)
+                        
+        Returns:
+            A new DataFrame with the target columns one-hot encoded and cast to float64.
+        """
+        if isinstance(columns, str):
+            columns = [columns]
+            
+        # Get dummies drops the original categorical columns and replaces them with encoded boolean/int columns.
+        encoded_df = pd.get_dummies(df, columns=columns, drop_first=drop_first, dtype=np.float64)
+        return encoded_df
 
     def plot_corr_matrix_heatmap(self, datasets: list[npt.NDArray[np.float64]], labels: list[str]) -> None:
         """Plot a heatmap of the correlation matrix for the given datasets."""
