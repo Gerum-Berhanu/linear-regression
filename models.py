@@ -64,7 +64,7 @@ class SimpleLinearRegression:
         return self.b0 + self.b1 * input_test_data
     
 class MultiLinearRegression:
-    def train(self, features: list[npt.NDArray[np.float64]] | npt.NDArray[np.float64], label: npt.NDArray[np.float64], fit_intercept: bool = True):
+    def train(self, features: list[npt.NDArray[np.float64]] | npt.NDArray[np.float64], label: npt.NDArray[np.float64], fit_intercept: bool = False):
         """
         Train the multiple linear regression model using Ordinary Least Squares (OLS).
 
@@ -108,7 +108,7 @@ class MultiLinearRegression:
         self.y = label
         self._fit()
 
-    def _features_matrix(self, features: list[npt.NDArray[np.float64]], fit_intercept: bool = True) -> npt.NDArray[np.float64]:
+    def _features_matrix(self, features: list[npt.NDArray[np.float64]], fit_intercept: bool = False) -> npt.NDArray[np.float64]:
         """
         Construct and return the feature design matrix (X) by stacking the feature arrays.
         Optionally prepends a column of ones for the intercept term.
