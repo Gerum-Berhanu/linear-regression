@@ -81,18 +81,22 @@ class MultiLinearRegression:
         if label.ndim != 1:
             raise ValueError("Label data must be one-dimensional.")
 
+        # Save preference so predict() applies the same intercept logic later
         self.fit_intercept = fit_intercept
 
+        # Handle pre-processed 2D matrix
         if isinstance(features, np.ndarray):
             if features.ndim != 2:
                 raise ValueError("Pre-processed features matrix must be a 2D numpy array.")
             
+            # Prepend intercept column if requested
             if fit_intercept:
                 n_samples = features.shape[0]
                 ones = np.ones((n_samples, 1), dtype=np.float64)
                 self.X = np.hstack((ones, features))
             else:
                 self.X = features
+        # Handle list of 1D feature arrays
         else:
             if len(features) == 0:
                 raise ValueError("At least one feature dataset is required.")
@@ -135,8 +139,10 @@ class MultiLinearRegression:
                     f"features[0] has length {n_samples}, features[{idx}] has length {len(feature)}."
                 )
 
+        # Bind all arrays together into a single 2D design matrix
         X = np.column_stack(features).astype(np.float64)
         
+        # Optionally prepend a column of 1s so the model can learn an intercept/baseline
         if fit_intercept:
             ones = np.ones((n_samples, 1), dtype=np.float64)
             return np.hstack((ones, X))
@@ -148,13 +154,13 @@ class MultiLinearRegression:
         X = self.X
         y = self.y
         T = X.T
-        XT = T @ X
+        TX = T @ X
 
-        det = np.linalg.det(XT)
+        det = np.linalg.det(TX)
         if np.isclose(det, 0):
-            raise ValueError("Matrix is singular.")
+            raise ValueError("Matrix is singular (not invertible).")
         
-        inv = np.linalg.inv(XT)
+        inv = np.linalg.inv(TX)
 
         self.theta = inv @ (T @ y)
 
@@ -171,10 +177,12 @@ class MultiLinearRegression:
         if not hasattr(self, "theta"):
             raise ValueError("Model must be trained before prediction.")
 
+        # Match exactly how X was processed during training depending on input type
         if isinstance(new_dataset, np.ndarray):
             if new_dataset.ndim != 2:
                 raise ValueError("Pre-processed features matrix must be a 2D numpy array.")
             
+            # Apply identical intercept logic from the training phase directly to test set
             if self.fit_intercept:
                 n_samples = new_dataset.shape[0]
                 ones = np.ones((n_samples, 1), dtype=np.float64)
@@ -182,7 +190,7 @@ class MultiLinearRegression:
             else:
                 X_new = new_dataset
         else:
-            fit_intercept = getattr(self, "fit_intercept", True)
-            X_new = self._features_matrix(new_dataset, fit_intercept)
+            # Reconstruct list of 1D arrays into matrix applying earlier intercept rules
+            X_new = self._features_matrix(new_dataset, self.fit_intercept)
             
         return X_new @ self.theta
