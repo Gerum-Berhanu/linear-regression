@@ -64,14 +64,30 @@ class SimpleLinearRegression:
         return self.b0 + self.b1 * input_test_data
     
 class MultiLinearRegression:
-    def train(self, features: list[npt.NDArray[np.float64]], label: npt.NDArray[np.float64]):
+    def train(self, features: list[npt.NDArray[np.float64]] | npt.NDArray[np.float64], label: npt.NDArray[np.float64]):
+        """
+        Train the multiple linear regression model using Ordinary Least Squares (OLS).
+
+        Args:
+            features: A list of 1D numpy arrays, where each array represents a separate feature column, OR a pre-processed 2D numpy array design matrix (X).
+            label: A 1D numpy array representing the target/output variable.
+            
+        Raises:
+            ValueError: If the label is not 1D, if there are no features, if features matrix is not 2D, 
+                        or if the number of samples in the features and label arrays do not match.
+        """
         if label.ndim != 1:
             raise ValueError("Label data must be one-dimensional.")
 
-        if len(features) == 0:
-            raise ValueError("At least one feature dataset is required.")
+        if isinstance(features, np.ndarray):
+            if features.ndim != 2:
+                raise ValueError("Pre-processed features matrix must be a 2D numpy array.")
+            self.X = features
+        else:
+            if len(features) == 0:
+                raise ValueError("At least one feature dataset is required.")
+            self.X = self._features_matrix(features)
 
-        self.X = self._features_matrix(features)
         if len(label) != self.X.shape[0]:
             raise ValueError("Feature and label must have the same length.")
 
@@ -79,6 +95,20 @@ class MultiLinearRegression:
         self._fit()
 
     def _features_matrix(self, features: list[npt.NDArray[np.float64]]) -> npt.NDArray[np.float64]:
+        """
+        Construct and return the feature design matrix (X) by stacking the feature arrays 
+        and prepending a column of ones for the intercept term.
+
+        Args:
+            features: A list of 1D numpy arrays representing individual features.
+
+        Returns:
+            A 2D numpy array of shape (n_samples, n_features + 1), where the first column 
+            is populated with 1.0 (the bias/intercept column).
+
+        Raises:
+            ValueError: If any feature array is empty, not 1D, or if the arrays have mismatched lengths.
+        """
         if len(features) == 0:
             raise ValueError("At least one feature dataset is required.")
 
@@ -115,9 +145,15 @@ class MultiLinearRegression:
 
         self.theta = inv @ (T @ y)
 
-    def predict(self, new_dataset: list[npt.NDArray[np.float64]]) -> npt.NDArray[np.float64]:
+    def predict(self, new_dataset: list[npt.NDArray[np.float64]] | npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         if not hasattr(self, "theta"):
             raise ValueError("Model must be trained before prediction.")
 
-        X_new = self._features_matrix(new_dataset)
+        if isinstance(new_dataset, np.ndarray):
+            if new_dataset.ndim != 2:
+                raise ValueError("Pre-processed features matrix must be a 2D numpy array.")
+            X_new = new_dataset
+        else:
+            X_new = self._features_matrix(new_dataset)
+            
         return X_new @ self.theta
