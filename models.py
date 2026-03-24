@@ -1,6 +1,5 @@
 import numpy as np
 import numpy.typing as npt
-from toolkit import StatKit
 
 class SimpleLinearRegression:
     """Simple linear regression model with one input and one output.
