@@ -1,7 +1,12 @@
 __pycache__/
+
 datasets/
+
 venv/
 .venv/
+
 chat.json
+
 PRO_PLAN_GUIDE.md
 PRO_PLAN_GUIDE.html
+PLAN.md
