@@ -46,3 +46,24 @@ To summarize your exact points and why they are correct:
 2. **"Other" Bucket Grouping:** You simply define a rule: *"Any job title that does not appear at least 10 times in my dataset gets its text replaced with the word 'Other'."* This completely obliterates the outlier problem because Alice gets mixed into a bucket with 50 other random rare professions, smoothing out her $\$300k$ anomaly across a large stable mean.
 
 Your understanding of the model's behavior and the danger of Target Leakage on small sample sizes is now perfectly accurate.
+
+---
+
+## The Solution: Grouping into an "Other" Bucket
+
+To fix this target leakage, we group all rare job titles into a single `"Other"` bucket, and encode that bucket just like any other category by taking the mean of all members inside it.
+
+By combining all rare jobs (including high outliers like a $\$300k$ Graphic Designer and low outliers like a $\$45k$ Janitor) into one large `"Other"` group, you invoke the **Law of Large Numbers**.
+
+### How it obliterates the problem computationally
+If `"Other"` contains 50 rare jobs and averages out to $\$76,000$, the extreme mathematical target of the single $\$300k$ outlier is diluted. 
+When the ordinary least squares (OLS) matrix solver looks at the outlier's row, it sees a target of $\$300k$ but an encoded feature of only $\$76k$. Because the math can no longer draw a perfect 1-to-1 correlation, it is forced to "give up" on using the job column as a magic shortcut. It accepts a high residual layout for that specific outlier and balances the parameters logically across the rest of the dataset.
+
+### Handling Unseen Data in the Real World
+When a completely unseen job title (e.g., `"AI Prompt Engineer"`) enters the testing pipeline, how is it handled?
+
+1. During training, a strict map of "known" frequent titles and their encodings is saved, alongside the calculated average for `"Other"`.
+2. When the unseen data arrives, it is checked against the dictionary. 
+3. Because it is not found, **it automatically falls back to the `"Other"` bucket's encoded value.**
+
+By sending unseen data to the `"Other"` bucket, the model essentially says: *"I don't know what this specific job is, so I will treat it mathematically as an averaged, generic job, and rely more heavily on their other features (like Experience or Education) to predict the outcome."* This robustly handles the unpredictable nature of real-world text logic.
