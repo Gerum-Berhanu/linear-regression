@@ -1,5 +1,8 @@
 # Target Encoding and the "Rare Label" Trap
 
+|Target Encoding is Label Encoding but for nominal data; assigning something that identifies and resonates the data instead of just being a matter of choice or arbitrary result.|
+|-|
+
 ## Overview
 Target Encoding (or Mean Encoding) is a powerful technique for converting categorical string data into numerical features that a linear regression model can understand. Instead of arbitrarily assigning IDs or creating hundreds of one-hot encoded dummy columns, you replace the category label with the **mean of the target variable** for that specific category.
 
