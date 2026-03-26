@@ -71,12 +71,22 @@ class ModelMetrics:
 
 class DatasetKit:
     @staticmethod
-    def bucket_dataset(X: npt.NDArray[Any], y: npt.NDArray[Any], fold: int, random_state: int | None = None) -> list[tuple[npt.NDArray[Any], npt.NDArray[Any]]]:
+    def bucket_dataset(X: npt.NDArray[Any] | list[npt.NDArray[Any]] | pd.DataFrame, y: npt.NDArray[Any], fold: int, random_state: int | None = None) -> list[tuple[npt.NDArray[Any], npt.NDArray[Any]]]:
         """
         Divide dataset into shuffled k-fold buckets for cross-validation.
         
         Returns list of (X, y) tuples with nearly equal bucket sizes.
         """
+        if isinstance(X, list):
+            if len(X) == 0:
+                raise ValueError("X must contain at least one feature array.")
+            X = np.column_stack(X)
+        elif isinstance(X, pd.DataFrame):
+            X = X.to_numpy()
+
+        if X.ndim not in (1, 2):
+            raise ValueError("X must be 1-D (single feature) or 2-D (multiple features).")
+
         _validate_paired_datasets(X, y)
         if fold <= 1:
             raise ValueError("Fold count must be greater than 1.")
@@ -113,9 +123,9 @@ class DatasetKit:
         # Get dummies drops the original categorical columns and replaces them with encoded boolean/int columns.
         encoded_df = pd.get_dummies(df, columns=columns, drop_first=drop_first, dtype=np.float64)
         return encoded_df
-    
+
     @staticmethod
-    def split_dataset(X: npt.NDArray[Any] | list[npt.NDArray[Any]], y: npt.NDArray[Any], train_percentage: float, random_state: int | None = None) -> tuple[npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any]]:
+    def train_test_split(X: npt.NDArray[Any] | list[npt.NDArray[Any]] | pd.DataFrame, y: npt.NDArray[Any], train_percentage: float, random_state: int | None = None) -> tuple[npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any]]:
         """Return X_train, X_test, y_train, y_test after shuffling.
 
         X may be 1-D (single feature) or 2-D with shape (n_samples, n_features).
@@ -124,6 +134,8 @@ class DatasetKit:
             if len(X) == 0:
                 raise ValueError("X must contain at least one feature array.")
             X = np.column_stack(X)
+        elif isinstance(X, pd.DataFrame):
+            X = X.to_numpy()
 
         if X.ndim not in (1, 2):
             raise ValueError("X must be 1-D (single feature) or 2-D (multiple features).")
