@@ -71,7 +71,7 @@ class ModelMetrics:
 
 class DatasetKit:
     @staticmethod
-    def bucket_dataset(X: npt.NDArray[Any] | list[npt.NDArray[Any]] | pd.DataFrame, y: npt.NDArray[Any], fold: int, random_state: int | None = None) -> list[tuple[npt.NDArray[Any], npt.NDArray[Any]]]:
+    def bucket_dataset(X: npt.NDArray[Any] | list[npt.NDArray[Any]] | pd.DataFrame, y: npt.NDArray[Any], fold: int, random_state: int | None = 42) -> list[tuple[npt.NDArray[Any], npt.NDArray[Any]]]:
         """
         Divide dataset into shuffled k-fold buckets for cross-validation.
         
@@ -125,7 +125,7 @@ class DatasetKit:
         return encoded_df
 
     @staticmethod
-    def train_test_split(X: npt.NDArray[Any] | list[npt.NDArray[Any]] | pd.DataFrame, y: npt.NDArray[Any], train_percentage: float, random_state: int | None = None) -> tuple[npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any]]:
+    def train_test_split(X: npt.NDArray[Any] | list[npt.NDArray[Any]] | pd.DataFrame, y: npt.NDArray[Any], train_percentage: float, random_state: int | None = 42) -> tuple[npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any]]:
         """Return X_train, X_test, y_train, y_test after shuffling.
 
         X may be 1-D (single feature) or 2-D with shape (n_samples, n_features).
