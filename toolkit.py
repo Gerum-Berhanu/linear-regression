@@ -125,7 +125,7 @@ class DatasetKit:
         return encoded_df
     
     @staticmethod
-    def split_dataset(dataset: npt.NDArray[Any] | list[npt.NDArray[Any]] | pd.DataFrame, split_ratio: float, random_state: int | None = 42) -> tuple[npt.NDArray[Any], npt.NDArray[Any]]:
+    def split_dataset(dataset: npt.NDArray[Any] | list[npt.NDArray[Any]] | pd.DataFrame, split_ratio: float, random_state: int | None = 42) -> tuple[npt.NDArray[Any] | pd.DataFrame, npt.NDArray[Any] | pd.DataFrame]:
         """
         Split a single dataset into two parts based on a given ratio after shuffling.
 
@@ -135,28 +135,41 @@ class DatasetKit:
             random_state: Seed for the random number generator. Defaults to 42.
 
         Returns:
-            A tuple of two datasets divided according to the split ratio.
+            A tuple of two datasets divided according to the split ratio. If the input is a DataFrame, returns two DataFrames preserving columns.
         """
         if split_ratio <= 0 or split_ratio >= 1:
             raise ValueError("Split ratio must be between 0 and 1, exclusive.")
         
+        is_dataframe = isinstance(dataset, pd.DataFrame)
+        
         if isinstance(dataset, list):
             if len(dataset) == 0:
                 raise ValueError("Dataset list must contain at least one array.")
-            dataset = np.column_stack(dataset)
-        elif isinstance(dataset, pd.DataFrame):
-            dataset = dataset.to_numpy()
+            dataset_array = np.column_stack(dataset)
+        elif is_dataframe:
+            dataset_array = dataset.to_numpy()
+        else:
+            dataset_array = dataset
 
-        if dataset.ndim not in (1, 2):
+        if dataset_array.ndim not in (1, 2):
             raise ValueError("Dataset must be 1-D (single feature) or 2-D (multiple features).")
         
         rng = np.random.default_rng(random_state)
-        perm = rng.permutation(len(dataset))
-        ds_shuffled = dataset[perm]
+        perm = rng.permutation(len(dataset_array))
+        
+        split_point = int(len(dataset_array) * split_ratio)
+        train_indices = perm[:split_point]
+        test_indices = perm[split_point:]
 
-        split_point = int(len(dataset) * split_ratio)
-        ds_split_1 = ds_shuffled[:split_point]
-        ds_split_2 = ds_shuffled[split_point:]
+        if is_dataframe:
+            # For DataFrame, use integer-location based indexing (iloc) to slice by the shuffled row indices
+            ds_split_1 = dataset.iloc[train_indices].copy()
+            ds_split_2 = dataset.iloc[test_indices].copy()
+        else:
+            # For numpy arrays, slice directly
+            ds_split_1 = dataset_array[train_indices]
+            ds_split_2 = dataset_array[test_indices]
+            
         return ds_split_1, ds_split_2
 
     @staticmethod
