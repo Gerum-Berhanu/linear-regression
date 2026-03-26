@@ -5,9 +5,9 @@ import pandas as pd
 import models
 
 def _validate_paired_datasets(dataset_1: npt.NDArray[np.float64], dataset_2: npt.NDArray[np.float64]) -> None:
-    if len(dataset_1) != len(dataset_2):
-        raise ValueError("Paired datasets must have the same length.")
-    if len(dataset_1) == 0:
+    if dataset_1.shape[0] != dataset_2.shape[0]:
+        raise ValueError("Paired datasets must have the same number of samples.")
+    if dataset_1.shape[0] == 0:
         raise ValueError("Paired datasets cannot be empty.")
 
 class ModelMetrics:
