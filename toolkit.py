@@ -1,10 +1,11 @@
 import numpy as np
 import numpy.typing as npt
+from typing import Any
 import matplotlib.pyplot as plt
 import pandas as pd
 import models
 
-def _validate_paired_datasets(dataset_1: npt.NDArray[np.float64], dataset_2: npt.NDArray[np.float64]) -> None:
+def _validate_paired_datasets(dataset_1: npt.NDArray[Any], dataset_2: npt.NDArray[Any]) -> None:
     if dataset_1.shape[0] != dataset_2.shape[0]:
         raise ValueError("Paired datasets must have the same number of samples.")
     if dataset_1.shape[0] == 0:
@@ -70,7 +71,7 @@ class ModelMetrics:
 
 class DatasetKit:
     @staticmethod
-    def bucket_dataset(X: npt.NDArray[np.float64], y: npt.NDArray[np.float64], fold: int, random_state: int | None = None) -> list[tuple[npt.NDArray, npt.NDArray]]:
+    def bucket_dataset(X: npt.NDArray[Any], y: npt.NDArray[Any], fold: int, random_state: int | None = None) -> list[tuple[npt.NDArray[Any], npt.NDArray[Any]]]:
         """
         Divide dataset into shuffled k-fold buckets for cross-validation.
         
@@ -114,7 +115,7 @@ class DatasetKit:
         return encoded_df
     
     @staticmethod
-    def split_dataset(X: npt.NDArray[np.float64] | list[npt.NDArray[np.float64]], y: npt.NDArray[np.float64], train_percentage: float, random_state: int | None = None) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+    def split_dataset(X: npt.NDArray[Any] | list[npt.NDArray[Any]], y: npt.NDArray[Any], train_percentage: float, random_state: int | None = None) -> tuple[npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any]]:
         """Return X_train, X_test, y_train, y_test after shuffling.
 
         X may be 1-D (single feature) or 2-D with shape (n_samples, n_features).
@@ -122,7 +123,7 @@ class DatasetKit:
         if isinstance(X, list):
             if len(X) == 0:
                 raise ValueError("X must contain at least one feature array.")
-            X = np.column_stack(X).astype(np.float64)
+            X = np.column_stack(X)
 
         if X.ndim not in (1, 2):
             raise ValueError("X must be 1-D (single feature) or 2-D (multiple features).")
