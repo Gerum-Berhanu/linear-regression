@@ -123,6 +123,41 @@ class DatasetKit:
         # Get dummies drops the original categorical columns and replaces them with encoded boolean/int columns.
         encoded_df = pd.get_dummies(df, columns=columns, drop_first=drop_first, dtype=np.float64)
         return encoded_df
+    
+    @staticmethod
+    def split_dataset(dataset: npt.NDArray[Any] | list[npt.NDArray[Any]] | pd.DataFrame, split_ratio: float, random_state: int | None = 42) -> tuple[npt.NDArray[Any], npt.NDArray[Any]]:
+        """
+        Split a single dataset into two parts based on a given ratio after shuffling.
+
+        Args:
+            dataset: The input array, list of arrays, or DataFrame to split.
+            split_ratio: Float between 0 and 1 representing the proportion of the first split.
+            random_state: Seed for the random number generator. Defaults to 42.
+
+        Returns:
+            A tuple of two datasets divided according to the split ratio.
+        """
+        if split_ratio <= 0 or split_ratio >= 1:
+            raise ValueError("Split ratio must be between 0 and 1, exclusive.")
+        
+        if isinstance(dataset, list):
+            if len(dataset) == 0:
+                raise ValueError("Dataset list must contain at least one array.")
+            dataset = np.column_stack(dataset)
+        elif isinstance(dataset, pd.DataFrame):
+            dataset = dataset.to_numpy()
+
+        if dataset.ndim not in (1, 2):
+            raise ValueError("Dataset must be 1-D (single feature) or 2-D (multiple features).")
+        
+        rng = np.random.default_rng(random_state)
+        perm = rng.permutation(len(dataset))
+        ds_shuffled = dataset[perm]
+
+        split_point = int(len(dataset) * split_ratio)
+        ds_split_1 = ds_shuffled[:split_point]
+        ds_split_2 = ds_shuffled[split_point:]
+        return ds_split_1, ds_split_2
 
     @staticmethod
     def train_test_split(X: npt.NDArray[Any] | list[npt.NDArray[Any]] | pd.DataFrame, y: npt.NDArray[Any], train_percentage: float, random_state: int | None = 42) -> tuple[npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any]]:
