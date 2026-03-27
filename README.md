@@ -1,13 +1,15 @@
 # Linear Regression From Scratch
 
-A from-scratch implementation of simple linear regression using NumPy, Pandas, and Matplotlib that demonstrates the mathematical foundations of machine learning without relying on scikit-learn or similar libraries.
+A from-scratch implementation of simple and multiple linear regression using NumPy, Pandas, and Matplotlib that demonstrates the mathematical foundations of machine learning without relying on scikit-learn or similar libraries.
 
 ## Project Structure
 
 - **load_dataset.py** - Downloads `Salary_Data.csv` from Kaggle into `datasets/` when the file is missing
-- **models.py** - Core `SimpleLinearRegression` class with closed-form solution implementation
-- **toolkit.py** - Utility classes (`ModelKit`, `StatKit`) for evaluation metrics and data operations
-- **salary.ipynb** - Full walkthrough notebook with explanations, visualizations, and analysis
+- **models.py** - Core `SimpleLinearRegression` and `MultiLinearRegression` classes with closed-form solution implementations
+- **preprocessing.py** - Specialized `SalaryDataPreprocessor` designed to handle target encoding and safe categorical variable mapping
+- **toolkit.py** - Utility classes (`ModelMetrics`, `DatasetKit`, `StatKit`) for evaluation metrics, matrix combinations, and stat operations
+- **salary.ipynb** - Walkthrough notebook featuring simple linear regression (single variable)
+- **salary-multi.ipynb** - Complete end-to-end multiple linear regression tracking data splitting, multicollinearity profiling, and scoring
 - **datasets/** - Contains Salary_Data.csv from [Kaggle](https://www.kaggle.com/datasets/mohithsairamreddy/salary-data)
 
 ## Setup
@@ -36,26 +38,41 @@ python load_dataset.py
 ```
 
 Why this step matters:
-- `salary.ipynb` expects a local copy of `datasets/Salary_Data.csv`
+- Both notebooks expect a local copy of `datasets/Salary_Data.csv`
 - `load_dataset.py` downloads the Kaggle dataset once, moves the CSV into the expected folder, and prints a quick preview so you can confirm the file loaded correctly
 - If the CSV already exists locally, the script detects that and skips the download
 
-The main analysis is in [salary.ipynb](salary.ipynb), which includes:
-- Data loading, cleaning, and splitting
-- Model training using years of experience to predict salary
-- K-fold cross validation
-- Performance evaluation (MAE, MAPE, RMSE, R²)
-- Visualizations and interpretations
+The main analysis is explored in two focal notebooks:
+
+1. **[salary.ipynb](salary.ipynb) (Simple Linear Regression)**
+   - Data loading, cleaning, and manual subset splitting
+   - Model training using purely *years of experience* to predict salary
+   - K-fold cross validation algorithms
+   - Visualizations and metrics interpretations
+
+2. **[salary-multi.ipynb](salary-multi.ipynb) (Multiple Linear Regression)**
+   - Handling dynamic properties via custom modular `preprocessing.py`
+   - Rare-category target encoding `Job Title`, mapping ordinal `Education`/`Gender` limits
+   - Correlation matrices/heatmaps analyzing feature multicollinearity 
+   - Multi-covariate modeling against baseline targets compared successfully against `Scikit-Learn`
 
 ## Implementation Details
 
+### Simple Linear Regression
 The `SimpleLinearRegression` class uses the closed-form least squares solution:
 
 $$b_0 = \frac{ \Sigma{y}\Sigma{x^2} - \Sigma{x}\Sigma{xy} }{ n\Sigma{x^2} - (\Sigma{x})^2 }$$
 
 $$b_1 = \frac{ n\Sigma{xy} - \Sigma{x}\Sigma{y} }{ n\Sigma{x^2} - (\Sigma{x})^2 }$$
 
-This approach doesn't require gradient descent or iterative optimization, making it computationally efficient for single-variable regression.
+### Multiple Linear Regression
+The `MultiLinearRegression` leverages scalable matrix calculus to model independent features using the **Normal Equation**:
+
+$$\theta = (X^T X)^{-1} X^T y$$
+
+*(Where $X$ is the dynamically mapped feature design matrix, and $\theta$ is the optimal parameter vector calculation natively supporting dynamic independent bias/intercept prepending).*
+
+Both of the above math deployments provide deterministic analytical solutions mathematically resolving parameters instantly, skipping any need to introduce iterative optimization logic like gradient descent.
 
 ## Evaluation Metrics
 
@@ -67,10 +84,7 @@ The `ModelKit` class provides:
 
 ## Quick Proof
 
-A quick proof of mine for how, fundamentally and mathematically, a simple linear regression works (how the parameters are calculated):
+A quick proof of mine for how, fundamentally and mathematically, a linear regression works (how the parameters are calculated):
 
-<img src="./linear_regression_proof.png" width="50%" style="display: block; margin: 0 auto;" alt="Simple linear regression proof">
-
-## What's next?
-
-1. Extend to multiple linear regression
+<img src="./img/closed-form-solution-page-1.png" width="45%" alt="closed-form solution proof page 1">
+<img src="./img/closed-form-solution-page-2.png" width="45%" alt="closed-form solution proof page 2">
