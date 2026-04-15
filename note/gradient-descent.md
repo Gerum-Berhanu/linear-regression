@@ -1,6 +1,6 @@
 # Briefly Explaining Gradient Descent
 
-## for Univariate Functions
+## Univariate Functions
 
 The aim of gradient descent is to find the $x$ value for which $\frac{df}{dx}=0$ or near-zero for the funciton $f(x)$; specifically for bowl shaped $f$.
 
@@ -13,7 +13,7 @@ Do these steps in a loop until the next guess is near-equal to the current one. 
 
 For a multivariate function, everything we do before applies the same for each variables with respect to their individual partial slopes.
 
-## for Multivariate Functions
+## Multivariate Functions
 
 The aim of gradient descent is to find the $x_1, x_2, \dots, x_n$ value for which $\frac{\partial f}{\partial x_1}=0, \frac{\partial f}{\partial x_2}=0, \dots, \frac{\partial f}{\partial x_n}=0$ or near-zero for the funciton $f$; specifically for a bowl shaped $f$ with one global minimum.
 
@@ -31,13 +31,9 @@ Do these steps in a loop until the next guess is near-equal to the current one. 
 
 ## The Learning Rate
 
-### What is it about the learning rate?
+What is it about the learning rate? Without the learning rate, $x_\text{next} = x_\text{current} - \text{slope}$, each guess has equal constant gaps $|slope|$. This is bad and mostly can't achieve our goal. With the application of learning rate, a value between 0 and 1, we manage the gaps to narrow as we approach the target.
 
-Without the learning rate, $x_\text{next} = x_\text{current} - \text{slope}$, each guess has equal constant gaps. This is bad. With the application of learning rate, a value between 0 and 1, we manage the gaps to narrow as we approach the target.
-
-### How to choose one?
-
-There is no one universal (standard) learning rate. We choose the one that best suits our algorithm; in other words, the one that helps our gradient descent algorithm converge to the target point (the zero slope). For example, a 0.1 lr may take the next guess at some point to jump over the zero-point, leading to divergence. 0.001 lr may converge, but could be too slow (taking forever). So, maybe 0.01 is the best lr.
+So, how to choose one? There is no one universal (standard) learning rate. We choose the one that best suits our algorithm; in other words, the one that helps our gradient descent algorithm converge to the target point (the zero slope). For example, a 0.1 lr may take the next guess at some point to jump over the zero-point, leading to divergence. 0.001 lr may converge, but could be too slow (taking forever). So, maybe 0.01 is the best lr.
 
 To choose the learning rate that best suits our function, we once again follow an iterative approach. Kind of like a brute-force appraoch; we checkout for multiple lr values, like 1, 0.1, 0.01, 0.001... and choose the best one. The best one is the one that takes the lowest number of iterations to reach the target point. More technically, the lowest number of iterations to take $c$ near to zero, where $c$ is the step size $c = \text{slope}\cdot\text{lr}$ so that in the next guess formula $x_\text{next} = x_\text{current} - c$, $c$ becomes neglibile, resulting in near-same next guess suggesting that we have got the input value for which output has a near-zero slope.
 
@@ -61,3 +57,7 @@ Once we find out the partial derivatives, applying gradient descent is easy; jus
     $m_\text{next} = 0 - \frac{\partial f}{\partial m=0}\cdot lr$
 
 We do this until our $c$ values $c_b=\frac{\partial f}{\partial b}\cdot lr$ and $c_m=\frac{\partial f}{\partial m}\cdot lr$ are so close to zero. In the end, we take the final next guesses for both $b$ and $m$ as the best fit parameters. Because, remember that the goal of linear regression is to find the input values for which the sum of squared errors (loss function) is zero slope.
+
+Gradient descent has a more significant impact on multivariate linear regressions because there, mostly in real world, the closed-form solutions require high computation power. One thing about it is that it doesn't care about linear dependencies unlike $\theta = (X^TX)^{-1}X^Ty$. With gradient descent, we don't have to worry about non-invertible matrices, near-zero determinant and such edge-cases.
+
+One thing we do need to worry though is about the range (scale) of the input data. For a dataset containing age and salary, for example, the age feature is usually in the range between 1-100, while salary is between say 1,000-100,000. We use the same learning rate for all parameters of the features. And that's where we find a critical issue. The learning rate my converge the age feature but may not work for the salary. We can find different learning rates tailored to each features, or we can standardize (scale down to a specific range) the entire dataset and use one learning rate for all.
